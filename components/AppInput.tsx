@@ -35,15 +35,13 @@ export default function AppInput({ setText, placeholder, style }): JSX.Element {
           backgroundColor: colors.white,
           fontSize: phoneFontScale * 36 / 2,
           borderRadius: 100,
-          color: '#FFF',
+          color: colors.darkTwo,
           borderColor: color,
           borderWidth: 1
         }}
         placeholder={placeholder}
         placeholderTextColor="#00000082"
-        onChangeText={val => {
-          setText(val);
-        }}
+        onChangeText={setText}
       />
     </View>
   );

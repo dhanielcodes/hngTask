@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import ProfileLayout from '../layouts/ProfileLayout';
 import { colors } from '../utils/colors';
 import { phoneHeight, phoneWidth } from '../utils/dimensions';
 import AppButton from '../components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function HomePage({ navigation }): JSX.Element {
 
@@ -13,6 +14,41 @@ function HomePage({ navigation }): JSX.Element {
         github: 'dhanielcodes',
         bio: "'Dhaniel' is a Frontend and Mobile Engineer. Does everything from Vue to React 💚",
     })
+
+    const getData = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('details');
+            return jsonValue != null ? JSON.parse(jsonValue) : null;
+        } catch (e) {
+            // error reading value
+        }
+    };
+
+    const getMain = () => {
+        getData()
+            .then(data => data)
+            .then(value => {
+                console.log("yourKey Value:  " + JSON.stringify(value))
+                setProfile(JSON.stringify(value))
+                console.log('ot', profile)
+
+            })
+            .catch(err => console.log(err))
+    }
+    const storeDetails = async (itemKey: any, itemVal: any) => {
+        try {
+            const jsonValue = JSON.stringify(itemVal);
+            await AsyncStorage.setItem(`${itemKey}`, jsonValue);
+            getMain()
+        } catch (e) {
+            // saving error
+        }
+
+    };
+    useEffect(() => {
+        storeDetails('details', profile)
+    }, [])
+
     return (
         <ProfileLayout marginBottom={12}>
             {/* <Image style={{ height: phoneHeight * 0.56 / 2, width: phoneWidth * 1.2 / 2, borderRadius: 50, resizeMode: 'cover', marginTop: 20 }} source={require('../assets/profile.jpeg')} /> */}
