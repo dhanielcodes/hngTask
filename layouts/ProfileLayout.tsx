@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,12 @@ import {
   Touchable,
   TouchableWithoutFeedback,
   StyleSheet,
+  RefreshControl,
 } from 'react-native';
 import { colors } from '../utils/colors';
 import { phoneFontScale, phoneHeight, phoneWidth } from '../utils/dimensions';
 import AppButton from '../components/Button';
+import { useNavigation } from '@react-navigation/native';
 export default function ProfileLayout({
   children,
   title = 'Title',
@@ -18,7 +20,28 @@ export default function ProfileLayout({
   marginBottom = 50,
   setWebView,
   webView,
+  geData
 }) {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      if (geData) {
+        geData()
+      }
+    }, 2000);
+  }, []);
+  const navigation = useNavigation()
+
+  const routes = navigation.getState()?.routeNames;
+  const prevRoute = routes[routes.length - 2]
+  useEffect(() => {
+    onRefresh()
+  }, [prevRoute])
+
+  console.log(prevRoute)
   return (
     <ScrollView
       style={{
@@ -28,7 +51,9 @@ export default function ProfileLayout({
         paddingRight: 20,
         height: phoneHeight,
         position: 'relative',
-      }}>
+      }} refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <View style={{ marginTop: 50 }}>
         <View
           style={{

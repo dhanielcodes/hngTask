@@ -7,35 +7,25 @@ import AppButton from '../components/Button';
 import AppInput from '../components/AppInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getItem, setItem } from '../utils/useLocalStorage';
+import { useNavigation } from '@react-navigation/native';
 
 
-function EditPage({ navigation }): JSX.Element {
-    const [profile, setProfile] = useState({})
+function EditPage(): JSX.Element {
+    const [profile, setProfile] = useState({
+        fullname: '',
+        slackname: '',
+        github: '',
+        bio: ''
+    })
 
-    const getData = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('details');
-            return jsonValue != null ? JSON.parse(jsonValue) : null;
-        } catch (e) {
-            // error reading value
-        }
-    };
-
-    const getMain = () => {
-        getData()
-            .then(data => data)
-            .then(value => {
-                console.log("yourKey Value:  " + JSON.stringify(value))
-                setProfile(JSON.stringify(value))
-            })
-            .catch(err => console.log(err))
-    }
+    const navigation = useNavigation()
 
     const storeDetails = async (itemKey: any, itemVal: any) => {
         try {
             const jsonValue = JSON.stringify(itemVal);
             await AsyncStorage.setItem(`${itemKey}`, jsonValue);
-            getMain()
+            navigation.navigate('Home')
+
         } catch (e) {
             // saving error
         }
@@ -59,7 +49,14 @@ function EditPage({ navigation }): JSX.Element {
                 }} placeholder="Bio" />
             </View>
             <AppButton title="Save Updates" onPress={() => {
-                storeDetails('details', profile)
+                if (profile?.fullname && profile?.slackname && profile?.github && profile?.bio) {
+                    storeDetails('fullname', profile?.fullname)
+                    storeDetails('slackname', profile?.slackname)
+                    storeDetails('github', profile?.github)
+                    storeDetails('bio', profile?.bio)
+                } else {
+                    return
+                }
             }} style={{ borderRadius: 30 }} />
         </ProfileLayout>
     );
